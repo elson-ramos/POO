@@ -1,0 +1,2 @@
+sala verde (Sala com Projetor)
+sala vermelha (Sala sem Projetor)

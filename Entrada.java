@@ -1,6 +1,13 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -102,13 +109,57 @@ public class Entrada {
      * @return A opção digitada pelo usuário convertido para true ou false
      */
     private boolean lerAdicional(String msg) {
-        String linha = this.lerLinha(msg).trim();
+        String linha = this.lerLinha(msg).trim(); // le a linha original
+
+        // enquanto for diferente de s ou n, repita
         while (!linha.equalsIgnoreCase("s") && !linha.equalsIgnoreCase("n")) {
             System.out.println("erro: responda apenas com 's' ou 'n'");
             linha = this.lerLinha(msg).trim();
         }
         
-        return linha.equalsIgnoreCase("s");
+        // return linha.equalsIgnoreCase("s");
+        // não funcionou assim (por que?)
+
+        if (linha.equalsIgnoreCase("s")) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    private String lerAlfanumerico(String msg) {
+        while (true) {
+            String linha = this.lerLinha(msg); // leitura da linha original
+
+            // verifica se possui apenas:
+            // 1. letras de a até z
+            // 2. letras de A até Z
+            // 3. números de 0 até 9
+            // 4. espaços
+            if (linha.matches("^[a-zA-Z0-9 ]+$")) {
+                return linha.trim();
+            }
+
+            System.out.println("erro: digite apenas letras, números e espaços");
+        }
+    }
+
+    private String lerApenasLetras(String msg) {
+        while (true) {
+            String linha = this.lerLinha(msg); // leitura da linha original
+
+            // verifica se possui apenas:
+            // 1. letras de a até z
+            // 2. letras de A até Z
+            // 3. números de 0 até 9
+            // 4. espaços
+            if (linha.matches("^[a-zA-Z0-9 ]+$")) {
+                return linha.trim();
+            }
+
+            System.out.println("erro: digite apenas letras, números e espaços");
+        }
     }
 
     /**
@@ -223,7 +274,19 @@ public class Entrada {
      * @return Novo objeto Sistema com os dados lidos
      */
     public Sistema criarSistema() {
-        System.out.println("Iniciando o sistema...");
+        System.out.println("Iniciando o sistema");
+        System.out.println("Carregando dados...");
+        try {
+            FileReader f = new FileReader("clientes.txt");
+            BufferedReader buff = new BufferedReader(f);
+            String dados = buff.readLine();
+            
+
+            buff.close();
+        } catch (IOException e) {
+            System.out.println("erro: nao foi possivel salvar no arquivo");
+        }
+    
         double valorHora = this.lerDouble("Digite o valor por hora para usar um espaco: R$ ");
         double taxaLimpeza = this.lerDouble("Digite a taxa de limpeza: R$ ");
         double precoProjetor = this.lerDouble("Digite o valor extra para usar o projetor: R$ ");
@@ -273,7 +336,7 @@ public class Entrada {
         this.listarSalas(s);
 
         System.out.println("Cadastrando Sala.");
-        String descricao = this.lerLinha("Digite o nome da sala: ");
+        String descricao = this.lerAlfanumerico("Digite o nome da sala: ");
         boolean projetor = this.lerAdicional("Possui projetor? (s/n): ");
 
         ArrayList<Sala> salas = s.getSalas();
@@ -297,11 +360,9 @@ public class Entrada {
         this.listarEstacoes(s);
 
         System.out.println("Cadastrando Estacao.");
-        String descricao = this.lerLinha("Digite o nome da estação: ");
-        String resp = this.lerLinha("A estacao possui monitor extra: (s/n): ");
+        String descricao = this.lerAlfanumerico("Digite o nome da estação: ");
+        boolean monitorExtra = this.lerAdicional("A estacao possui monitor extra: (s/n): ");
         
-
-        boolean monitorExtra = resp.equalsIgnoreCase("s");
 
         ArrayList<Estacao> estacoes = s.getEstacoes();
         boolean existe = false;
@@ -349,7 +410,7 @@ public class Entrada {
     }
 
     public String lerTipo(Sistema s){
-        String tipo = lerLinha("Deseja reservar uma sala ou estacao de trabalho? (s/e):");
+        String tipo = lerLinha("Deseja reservar uma sala ou estacao de trabalho? (s/e): ");
         return tipo;
     }
 
@@ -404,17 +465,46 @@ public class Entrada {
 
     public void listarReservas(Sistema s){
         System.out.println("*********************************");
-        ArrayList<Reserva> reservas = s.getReservas();
+        //ArrayList<Reserva> reservas = s.getReservas();
+        
+        Collections.sort(s.getReservas(), new Comparator<Reserva>(){
 
-        if (reservas.isEmpty()) {
-            System.out.println("Nenhuma reserva cadastrada.");
-        }
-        else {
-            System.out.println("Clientes cadastrados:");
-            for (Reserva r : reservas) {
-                System.out.println(r);
+            public int compare(Reserva r1, Reserva r2){
+                // 1 critério: nome do cliente
+                int resultado = r1.getCli().getNome().compareTo(r2.getCli().getNome());
+            
+                //se nomes iguais
+                if(resultado == 0){
+                    // 2 criterio: preco maior primeiro
+                    if(r1.getEsp().preco(r1.getInicio(), r1.getFim()) > 
+                        r2.getEsp().preco(r2.getInicio(), r2.getFim())){
+                        return -1;
+                    }
+                    else if(r1.getEsp().preco(r1.getInicio(), r1.getFim()) < 
+                        r2.getEsp().preco(r2.getInicio(), r2.getFim())){
+                            return 1;
+                        }
+
+                        //3 critério: data mais recente
+                        resultado = r2.getD().compara(r1.getD());
+                }
+                
+                return resultado;
             }
+        });
+
+        for(Reserva r : s.getReservas()){
+            System.out.println(r);
+            System.out.println();
         }
+        //if (reservas.isEmpty()) {
+          //  System.out.println("Nenhuma reserva cadastrada.");}
+        //else {
+           // System.out.println("Clientes cadastrados:");
+            //for (Reserva r : reservas) {
+              //  System.out.println(r);
+           // }
+       // }
     }
 
     public void listarReservasData(Sistema s){

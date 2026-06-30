@@ -6,6 +6,7 @@
 public class Main {
     public static void main(String[] args) {
         Entrada e = new Entrada();
+        
         Sistema s = e.criarSistema();
 
         int op = e.menu();

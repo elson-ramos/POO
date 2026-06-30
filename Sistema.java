@@ -1,4 +1,9 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class Sistema {
     private ArrayList<Cliente> clientes = new ArrayList<>();
@@ -25,6 +30,21 @@ public class Sistema {
         // salvar as informacoes sobre o preco do monitor extra
     }
 
+    public <T> void escreveArquivo(String nome_arq, T objeto) {
+        // observação: achamos pertinente usar o tipo genérico nesse caso,
+        // ainda que não seja uma boa prática. julgamos ser melhor do que
+        // replicar esse trecho de código 4 vezes.
+        try {
+            FileWriter f = new FileWriter (nome_arq, true);
+            BufferedWriter buff = new BufferedWriter(f);
+            buff.write(objeto.toString());
+            buff.write("\n");
+            buff.close();
+        } catch (IOException e) {
+            System.out.println("erro: nao foi possivel salvar no arquivo");
+        }
+    }
+
 
     public ArrayList<Cliente> getClientes() {
         return clientes;
@@ -39,14 +59,17 @@ public class Sistema {
 
     public void cadastrar(Cliente cli) {
         this.clientes.add(cli);
+        this.escreveArquivo("clientes.txt", cli);
     }
 
     public void cadastrar(Estacao est) {
         this.estacoes.add(est);
-    }    
+        this.escreveArquivo("estacoes.txt", est);
+    }
 
     public void cadastrar(Sala sala) {
         this.salas.add(sala);
+        this.escreveArquivo("salas.txt", sala);
     }    
 
 

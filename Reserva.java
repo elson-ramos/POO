@@ -1,4 +1,4 @@
-public class Reserva{
+public class Reserva {
     private Data d;
     private Horario inicio;
     private Horario fim;

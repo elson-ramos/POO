@@ -20,7 +20,7 @@ public class Estacao extends Espaco{
 
 
     public boolean possuiAdicionalExtra(){
-        return monitorExtra;
+        return this.monitorExtra;
     }
 
     @Override

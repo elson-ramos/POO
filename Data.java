@@ -1,5 +1,3 @@
-
-
 public class Data{
 
     private int dia, mes, ano;
@@ -18,6 +16,39 @@ public class Data{
             return false;
         }
     }
+
+
+    public int compara(Data d2){
+
+        if(this.ano > d2.getAno()){
+            return 1;
+        }
+        else if(this.ano < d2.getAno()){
+            return -1;
+        }
+
+
+        // ano igual, compara mês
+        if(this.mes > d2.getMes()){
+            return 1;
+        }
+        else if(this.mes < d2.getMes()){
+            return -1;
+        }
+
+
+        // ano e mês iguais, compara dia
+        if(this.dia > d2.getDia()){
+            return 1;
+        }
+        else if(this.dia < d2.getDia()){
+            return -1;
+        }
+
+
+        return 0;
+    }
+
 
         public int getDia() {
             return dia;
